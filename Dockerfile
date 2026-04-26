@@ -5,7 +5,8 @@ RUN apk add --no-cache \
     jpeg \
     libpng \
     libwebp \
-    fontconfig
+    fontconfig \
+    ttf-dejavu
 
 WORKDIR /app
 
