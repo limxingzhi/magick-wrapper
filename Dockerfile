@@ -1,6 +1,11 @@
 FROM node:20-alpine
 
-RUN apk add --no-cache imagemagick
+RUN apk add --no-cache \
+    imagemagick \
+    jpeg \
+    libpng \
+    libwebp \
+    fontconfig
 
 WORKDIR /app
 
