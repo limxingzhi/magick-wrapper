@@ -29,11 +29,10 @@ function interlineSpacing(lineHeight, fontSize) {
   return Math.round((lineHeight - 1) * fontSize);
 }
 
-async function measureCaption(text, fontPath, fontSize, maxW, fontWeight, lineSpacing) {
+async function measureCaption(text, fontPath, fontSize, maxW, lineSpacing) {
   const args = [
     "-size", `${maxW}x`,
     "-font", fontPath,
-    "-weight", fontWeight,
     "-pointsize", String(fontSize),
     "-interline-spacing", String(lineSpacing),
     "caption:" + text,
@@ -45,11 +44,11 @@ async function measureCaption(text, fontPath, fontSize, maxW, fontWeight, lineSp
   return { width: w, height: h };
 }
 
-async function fitCaption(text, fontPath, maxFontSize, maxWidth, maxHeight, fontWeight, lineHeight) {
+async function fitCaption(text, fontPath, maxFontSize, maxWidth, maxHeight, lineHeight) {
   const MIN_FONT_SIZE = 10;
   let fontSize = maxFontSize;
   let lineSpacing = interlineSpacing(lineHeight, fontSize);
-  let m = await measureCaption(text, fontPath, fontSize, maxWidth, fontWeight, lineSpacing);
+  let m = await measureCaption(text, fontPath, fontSize, maxWidth, lineSpacing);
 
   if (m.height <= maxHeight && m.width <= maxWidth) {
     return { fontSize, textWidth: m.width, textHeight: m.height };
@@ -58,7 +57,7 @@ async function fitCaption(text, fontPath, maxFontSize, maxWidth, maxHeight, font
   fontSize = Math.floor(fontSize * Math.min(maxWidth / m.width, maxHeight / m.height));
   fontSize = Math.max(fontSize, MIN_FONT_SIZE);
   lineSpacing = interlineSpacing(lineHeight, fontSize);
-  m = await measureCaption(text, fontPath, fontSize, maxWidth, fontWeight, lineSpacing);
+  m = await measureCaption(text, fontPath, fontSize, maxWidth, lineSpacing);
   return { fontSize, textWidth: m.width, textHeight: m.height };
 }
 
@@ -89,7 +88,6 @@ function buildArgs(inputPath, opts) {
     fontSize,
     color,
     fontPath,
-    fontWeight,
     lineHeight,
     gravity,
     xOffset,
@@ -108,7 +106,7 @@ function buildArgs(inputPath, opts) {
   args.push(
     "(", "-size", sizeArg, "-background", "none",
     "-gravity", "center",
-    "-font", fontPath, "-weight", fontWeight, "-pointsize", String(fontSize),
+    "-font", fontPath, "-pointsize", String(fontSize),
     "-interline-spacing", String(lineSpacing),
     "-fill", color, "-stroke", "none",
     captionArg,
@@ -129,8 +127,7 @@ app.get("/caption", async (req, res) => {
     return res.status(400).json({ error: "Missing required params: url, text" });
   }
 
-  const requestedFont = req.query.font || "Helvetica";
-  const fontWeight = req.query.fontWeight || "Bold";
+  const requestedFont = req.query.font || "Noto Sans CJK SC";
   const lineHeight = parseFloat(req.query.lineHeight) || 1.3;
   const maxFontSize = parseInt(req.query.fontSize, 10) || 64;
   const maxWidthPct = parseFloat(req.query.maxWidthPct) || 0.85;
@@ -144,14 +141,13 @@ app.get("/caption", async (req, res) => {
     const maxWidth = Math.floor(imgW * maxWidthPct);
     const maxHeight = Math.floor(imgH * 0.4);
 
-    const { fontSize } = await fitCaption(text, fontPath, maxFontSize, maxWidth, maxHeight, fontWeight, lineHeight);
+    const { fontSize } = await fitCaption(text, fontPath, maxFontSize, maxWidth, maxHeight, lineHeight);
 
     const opts = {
       text,
       fontSize,
       color: req.query.color || "white",
       fontPath,
-      fontWeight,
       lineHeight,
       gravity: req.query.gravity || "center",
       xOffset: parseInt(req.query.x, 10) || 0,
