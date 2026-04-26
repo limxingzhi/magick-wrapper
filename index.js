@@ -64,10 +64,11 @@ async function fitCaption(text, fontPath, maxFontSize, maxWidth, maxHeight, font
 
 async function downloadToTemp(url) {
   const dir = await mkdtemp(join(tmpdir(), "magick-"));
-  const dest = join(dir, "input.jpg");
+  const dest = join(dir, "input");
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Failed to fetch image: ${res.status} ${res.statusText}`);
   const buffer = Buffer.from(await res.arrayBuffer());
+  if (buffer.length === 0) throw new Error("Downloaded file is empty");
   await writeFile(dest, buffer);
   return dest;
 }
