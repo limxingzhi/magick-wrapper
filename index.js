@@ -166,7 +166,7 @@ app.get("/caption", async (req, res) => {
 
     res.set({
       "Content-Type": "image/jpeg",
-      "Content-Disposition": 'attachment; filename="wallpaper.jpg"',
+      // "Content-Disposition": 'attachment; filename="wallpaper.jpg"',
       "Content-Length": stdout.length,
     });
     res.send(stdout);

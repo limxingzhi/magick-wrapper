@@ -6,7 +6,10 @@ RUN apk add --no-cache \
     libpng \
     libwebp \
     fontconfig \
-    ttf-dejavu
+    ttf-dejavu \
+    font-noto \
+    font-noto-cjk \
+    font-noto-emoji
 
 WORKDIR /app
 
